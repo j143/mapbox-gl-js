@@ -1,8 +1,10 @@
 
 const ValidationError = require('../error/validation_error');
+const validateExpression = require('./validate_expression');
 const validateEnum = require('./validate_enum');
 const getType = require('../util/get_type');
 const unbundle = require('../util/unbundle_jsonlint');
+const extend = require('../util/extend');
 
 module.exports = function validateFilter(options) {
     const value = options.value;
@@ -12,8 +14,16 @@ module.exports = function validateFilter(options) {
 
     let errors = [];
 
-    if (getType(value) !== 'array') {
-        return [new ValidationError(key, value, 'array expected, %s found', getType(value))];
+    type = getType(value);
+    if (type !== 'array' && type !== 'object') {
+        return [new ValidationError(key, value, 'array or object expected, %s found', getType(value))];
+    }
+
+    if (type === 'object') {
+        return validateExpression(extend({}, options, {
+            allowZoom: 'never',
+            valueSpec: { value: 'boolean' }
+        }));
     }
 
     if (value.length < 1) {

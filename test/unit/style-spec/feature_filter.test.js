@@ -3,6 +3,41 @@
 const test = require('mapbox-gl-js-test').test;
 const filter = require('../../../src/style-spec').featureFilter;
 
+test('expression, compare two properties', (t) => {
+    const f = filter({
+        expression: ['==', ['string', ['get', 'x']], ['string', ['get', 'y']]]
+    });
+    t.equal(f({properties: {x: 1, y: 1}}), false);
+    t.equal(f({properties: {x: '1', y: '1'}}), true);
+    t.equal(f({properties: {x: 'same', y: 'same'}}), true);
+    t.equal(f({properties: {x: null}}), false);
+    t.equal(f({properties: {x: undefined}}), false);
+    t.end();
+});
+
+test('expression, type error', (t) => {
+    t.throws(() => {
+        filter({
+            expression: ['==', ['number', ['get', 'x']], ['string', ['get', 'y']]]
+        });
+    });
+
+    t.throws(() => {
+        filter({
+            expression: ['number', ['get', 'x']]
+        });
+    });
+
+    t.doesNotThrow(() => {
+        filter({
+            expression: ['boolean', ['get', 'x']]
+        });
+    });
+
+    t.end();
+});
+
+
 test('degenerate', (t) => {
     t.equal(filter()(), true);
     t.equal(filter(undefined)(), true);

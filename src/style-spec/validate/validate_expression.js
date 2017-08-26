@@ -12,7 +12,15 @@ module.exports = function validateExpression(options) {
     const key = `${options.key}.expression`;
 
     if (compiled.result === 'success') {
-        if (!options.disallowNestedZoom || compiled.isZoomConstant) {
+        if (compiled.isZoomConstant) {
+            return [];
+        }
+
+        if (options.allowZoom === 'never') {
+            return [new ValidationError(`${key}`, options.value, '"zoom" expressions not available.')];
+        }
+
+        if (options.allowZoom !== 'top-level-curve') {
             return [];
         }
 
