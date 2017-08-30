@@ -21,7 +21,7 @@ module.exports = function validateFilter(options) {
 
     if (type === 'object') {
         return validateExpression(extend({}, options, {
-            allowZoom: 'never',
+            allowZoom: 'always',
             valueSpec: { value: 'boolean' }
         }));
     }

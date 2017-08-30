@@ -75,7 +75,7 @@ function run (evented, assets) {
                 const filter = layer.filters[j];
                 for (let k = 0; k < layer.features.length; k++) {
                     const feature = layer.features[k];
-                    if (typeof filter(feature) !== 'boolean') {
+                    if (typeof filter({zoom: 0}, feature) !== 'boolean') {
                         evented.fire('error', {message: 'Expected boolean result from filter'});
                         break;
                     }

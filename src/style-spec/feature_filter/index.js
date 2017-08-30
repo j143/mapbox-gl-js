@@ -4,6 +4,7 @@ const compileExpression = require('../function/compile');
 const {BooleanType} = require('../function/types');
 
 import type {Feature} from '../function';
+export type FeatureFilter = (globalProperties: {+zoom?: number}, feature: VectorTileFeature) => boolean;
 
 module.exports = createFilter;
 
@@ -16,9 +17,9 @@ module.exports = createFilter;
  * @param {Array} filter mapbox gl filter
  * @returns {Function} filter-evaluating function
  */
-function createFilter(filter: any) {
+function createFilter(filter: any): FeatureFilter {
     if (!filter) {
-        return (_: VectorTileFeature) => true;
+        return (globalProperties, _: VectorTileFeature) => true;
     }
 
     let expression = Array.isArray(filter) ? convertFilter(filter) : filter.expression;
@@ -28,13 +29,13 @@ function createFilter(filter: any) {
     const compiled = compileExpression(expression, BooleanType);
 
     if (compiled.result === 'success') {
-        return (feature: VectorTileFeature) => {
+        return (globalProperties, feature: VectorTileFeature) => {
             const expressionFeature: Feature = {
                 properties: feature.properties || {},
                 type: feature.type,
                 id: typeof feature.id !== 'undefined' ? feature.id : null
             };
-            return compiled.function({}, expressionFeature);
+            return compiled.function(globalProperties, expressionFeature);
         };
     } else {
         throw new Error(compiled.errors.map(err => `${err.key}: ${err.message}`).join(', '));

@@ -84,7 +84,7 @@ class FillExtrusionBucket implements Bucket {
 
     populate(features: Array<IndexedFeature>, options: PopulateParameters) {
         for (const {feature, index, sourceLayerIndex} of features) {
-            if (this.layers[0].filter(feature)) {
+            if (this.layers[0]._featureFilter({zoom: this.zoom}, feature)) {
                 this.addFeature(feature);
                 options.featureIndex.insert(feature, index, sourceLayerIndex, this.index);
             }

@@ -11,6 +11,7 @@ const Evented = require('../util/evented');
 import type {Bucket, BucketParameters} from '../data/bucket';
 import type Point from '@mapbox/point-geometry';
 import type {Feature} from '../style-spec/function';
+import type {FeatureFilter} from '../style-spec/feature_filter';
 
 export type GlobalProperties = {
     zoom: number
@@ -32,9 +33,11 @@ class StyleLayer extends Evented {
     sourceLayer: ?string;
     minzoom: ?number;
     maxzoom: ?number;
-    filter: any;
+    filter: mixed;
     paint: { [string]: any };
     layout: { [string]: any };
+
+    _featureFilter: FeatureFilter;
 
     _paintSpecifications: any;
     _layoutSpecifications: any;
@@ -70,6 +73,8 @@ class StyleLayer extends Evented {
 
         this.paint = {};
         this.layout = {};
+
+        this._featureFilter = () => true;
 
         this._paintSpecifications = styleSpec[`paint_${this.type}`];
         this._layoutSpecifications = styleSpec[`layout_${this.type}`];
